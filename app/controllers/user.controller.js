@@ -12,36 +12,50 @@ exports.create = (req, res) => {
         });
     }
 
-    const oldUser = User.findOne(email, null);
+    User.findOne(email, (err, data) => {
+        if (err) {
+          if (err.kind === "not_found") {
+            bcrypt.hash(password, 10, (error, hashedPassword)=> {
+                if(error) { 
+                    res.status(500).send({
+                        message:
+                        error
+                    });
+                } 
+                // Create a User
+                const user = new User({
+                    name: name,
+                    username: username,
+                    password: hashedPassword,
+                    email: email.toLowerCase(),
+                    no_telp: no_telp
+                });  
 
-    if (oldUser) {
-        res.status(409).send({
-            message:
-            err.message || "User Already Exist. Please Login"
-        });
-    }
-
-    //Encrypt user password
-    encryptedPassword = bcrypt.hash(password, 10);
-
-    // Create a User
-    const user = new User({
-        name: name,
-        username: username,
-        password: encryptedPassword,
-        email: email.toLowerCase(),
-        no_telp: no_telp
-    });  
-
-    // Save User in the database
-    User.create(user, (err, data) => {
-        if (err)
-        res.status(500).send({
-            message:
-            err.message || "Some error occurred while creating the Tutorial."
-        });
-        else res.send(data);
+                // Save User in the database
+                User.create(user, (err, data) => {
+                    if (err)
+                    res.status(500).send({
+                        message:
+                        err.message || "Some error occurred while creating the Tutorial."
+                    });
+                    else res.send(data);
+                });
+            });
+          } else {
+            res.status(500).send({
+            message: "Error retrieving User with id " + req.params.id
+            });
+          }
+        } else {
+            res.status(409).send({
+                message: "User Already Exist. Please Login"
+            });
+        }
     });
+
+    
+
+    
 };
 
 exports.findAll = (req, res) => {

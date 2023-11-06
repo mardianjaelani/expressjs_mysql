@@ -9,7 +9,7 @@ const User = function(user) {
 };
 
 User.findOne = (email, result) => {
-    sql.query(`SELECT * FROM users WHERE email LIKE '%${email}%'`, (err, res) => {
+    sql.query(`SELECT id, name, username, email, no_telp FROM users WHERE email LIKE '%${email}%'`, (err, res) => {
       if (err) {
         console.log("error: ", err);
         result(err, null);
@@ -28,7 +28,7 @@ User.findOne = (email, result) => {
 };
 
 User.findById = (id, result) => {
-    sql.query(`SELECT * FROM users WHERE id = ${id}`, (err, res) => {
+    sql.query(`SELECT id, name, username, email, no_telp FROM users WHERE id = ${id}`, (err, res) => {
       if (err) {
         console.log("error: ", err);
         result(err, null);
@@ -47,7 +47,7 @@ User.findById = (id, result) => {
 };
   
 User.getAll = (user, result) => {
-    let query = "SELECT * FROM users";
+    let query = "SELECT id, name, username, email, no_telp FROM users";
   
     if (user) {
       query += ` WHERE name LIKE '%${user}%'`;
